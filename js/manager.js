@@ -34,6 +34,21 @@ Component.entryPoint = function(NS){
 		_onLoadManager: function(){
 			this.elHide('loading');
 			this.elShow('view');
+		},
+		onClick: function(el, tp){
+			switch(el.id){
+			case tp['bbuild']: this.build(); return true;
+			}
+		},
+		build: function(){
+			this.elShow('bloading');
+			this.elHide('btns');
+			
+			var __self = this;
+			NS.manager.build(function(){
+				__self.elShow('btns');
+				__self.elHide('bloading');
+			});
 		}
 	});
 	NS.ManagerWidget = ManagerWidget;

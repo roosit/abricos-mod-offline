@@ -62,6 +62,13 @@ Component.entryPoint = function(NS){
 					NS.life(callback, request.data);
 				}
 			});
+		},
+		build: function(callback){
+			this.ajax({
+				'do': 'build'
+			}, function(d){
+				NS.life(callback);
+			});				
 		}
 	};
 	NS.manager = null;

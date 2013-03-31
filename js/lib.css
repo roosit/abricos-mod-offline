@@ -5,6 +5,15 @@
 	padding: 70px 0; 
 }
 
+.aw-offline .pagetl {
+    color: #333333;
+    font-size: 1.28em;
+    font-weight: bold;
+    padding-bottom: 0.5em;
+
+	font-weight: normal !important;
+}
+
 /* * * * * * AHref Button * * * * */
 .aw-offline a.habtn {
 	border-bottom: 1px dotted;
