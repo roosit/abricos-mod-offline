@@ -1,0 +1,105 @@
+/* * * * wspace.css begin * * * */
+.aw-offline .wspage {
+	min-height: 160px;
+}
+.aw-offline .ws-loading {
+	margin: 70px 0;
+	text-align: center;
+}
+
+.aw-offline .gheadermenu {
+	position: relative;
+	padding: 15px 0 0 150px;
+	height: 100px;
+}
+.aw-offline .gheadermenu h2 {
+	padding: 5px 10px;
+	font-size: 1.5em;
+	background-color: #6A718A;
+	color: #fff;
+}
+.aw-offline .gheadermenu a.logo {
+	position: absolute;
+	top: 0; left: 30px;
+}
+.aw-offline .gheadermenu img.logo {
+	width: 96px;
+	height: 96px;
+}
+
+.aw-offline .gheadermenu .topmenublock {
+	position: relative;
+}
+.aw-offline .gheadermenu ul.topmenul {
+	margin: 10px;
+	margin-top: 6px;
+}
+.aw-offline .gheadermenu ul.topmenur {
+	position: absolute;	top: 1px; right: 1px;
+}
+.aw-offline .gheadermenu ul.topmenu li{
+	float: left;
+    padding: 1px 0.5em;
+    margin-right: 10px;
+}
+.aw-offline .gheadermenu ul.topmenu a {
+	font-size: 
+}
+.aw-offline .gheadermenu ul.topmenu li.sel {
+	background: none repeat scroll 0 0 #E8E9ED;
+    border: 1px solid #DCDEE4;
+}
+.aw-offline .gheadermenu ul.topmenu li.sel a {
+	color: #3B4054;
+	text-decoration: none;
+}
+
+.aw-offline .gbmenu a {
+	text-decoration: none;
+	font-size: 14px;
+	color: #2A2D3C;
+}
+.aw-offline .gbmenu .gbitems {
+	margin-left: 10px;
+}
+.aw-offline .gbmenu .gbitem {
+	text-align: center;
+	min-width: 100px;
+	cursor: pointer;
+	float: left;
+	margin: 0 1px;
+	padding: 5px 15px; 
+	background-color: #F3F4F6;
+}
+.aw-offline .gbmenu .r {
+	float: right;
+}
+.aw-offline .gbmenu .gbitem:hover {
+	text-decoration: underline;	
+}
+.aw-offline .gbmenu .current {
+	background-color: #E8E9ED;
+}
+.aw-offline .gbmenu .current:hover {
+	text-decoration: none;	
+}
+.aw-offline .gbmenu .line {
+    background: url("/modules/offline/images/gmshadow.png") repeat-x scroll 0 0 transparent;
+	height: 16px;
+}
+
+.aw-offline .wspacetable {
+	width: 100%;
+}
+.aw-offline .wspacetable .wscol-content {
+	padding-right: 20px;
+}
+.aw-offline .wspacetable .wscol-right {
+	width: 250px;
+	max-width: 250px;
+}
+
+.aw-offline .wscol-right .blockbox {
+	margin-bottom: 10px;
+}
+/* * * * wspace.css end * * * */
