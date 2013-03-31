@@ -96,11 +96,82 @@ class OfflineManager extends Ab_ModuleManager {
 		return $ret;
 	}
 	
+	private $_tplPage = "";
+	public function WritePage(OfflineDir $dir, $fname, $content, $title = ''){
+		$filename = $dir->GetFileName($fname);
+		
+		if (file_exists($filename)){
+			unlink($filename);
+		}
+			
+		$fh = fopen($filename, 'a');
+		
+		if (!$fh){ return false; }
+		
+		$css = "";
+
+		$str = Brick::ReplaceVarByData($this->_tplPage, array(
+			"title" => $title,
+			"content" =>  $content,
+			"rooturi" => $dir->rootURI,
+			"csslinks" => $css
+		));
+		
+		fwrite($fh, $str);
+		fflush($fh);
+		fclose($fh);
+	}
+	
 	public function BuildOffline(){
-		if ($this->IsAdminRole()){ return null; }
+		if (!$this->IsAdminRole()){ return null; }
 		
+		$brick = Brick::$builder->LoadBrickS("offline", "page", null);
+		$this->_tplPage = $brick->content;
 		
+		$brickIndex = Brick::$builder->LoadBrickS("offline", "index", null);
+		$vIndex = &$brickIndex->param->var;
 		
+		// зарегистрировать все модули
+		Abricos::$instance->modules->RegisterAllModule();
+		$modules = Abricos::$instance->modules->GetModules();
+		
+		$rootDir = new OfflineDir(null, CWD."/cache/offline");
+		
+		$modList = "";
+		$modAList = array();
+		
+		// произвести выгрузку в модулях где есть реализация
+		$sqls = array();
+		foreach ($modules as $name => $module){
+			if (!method_exists($module, 'Offline_IsBuild')){ continue; }
+			if (!$module->Offline_IsBuild()){ continue; }
+			
+			$manager = 	$module->GetManager();
+			if (!method_exists($manager, 'Offline_Build')){ continue; }
+
+			$modDir = new OfflineDir($rootDir, $module->takelink);
+
+			$manager->Offline_Build($modDir);
+			
+			$link = $name."/index.html";
+			
+			if (!empty($vIndex['menuitem-'.$name])){
+				$modList .= Brick::ReplaceVarByData($vIndex['menuitem-'.$name], array(
+					"url" => $link
+				));
+			}else{
+				$modList .= Brick::ReplaceVarByData($vIndex['menuitem'], array(
+					"url" => $link
+				));
+			}
+			$modAList["url".$name] = $link;
+		}
+		$modAList["menulist"] = $modList;
+		
+		$brickIndex->content = Brick::ReplaceVarByData($brickIndex->content, $modAList);
+		$this->WritePage($rootDir, "index", $brickIndex->content);
+		
+		return true;
 	}
 	
 	

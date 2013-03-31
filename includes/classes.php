@@ -8,6 +8,64 @@
 
 require_once 'dbquery.php';
 
+class OfflineDir {
+	
+	/**
+	 * @var OfflineDir
+	 */
+	public $parent;
+	
+	public $path;
+	
+	/**
+	 * Имя директории
+	 * @var string
+	 */
+	public $name;
+	
+	public $rootURI = "";
+	
+	public $rootPath = "";
+	
+	public function __construct($parent, $name){
+		$this->parent = $parent;
+		
+		if (empty($parent)){ // это рутовая директория
+			$this->rootPath = $name;
+			$this->path = $name;
+			$this->name = "";
+		}else{
+			$this->rootPath = $parent->rootPath;
+			$this->path = $parent->path."/".$name;
+			$this->name = $name;
+		}
+		$this->path = realpath($this->path);
+
+		@mkdir($this->path);
+		
+		$this->rootURI = $this->BuildRootURI();
+	}
+	
+	public function GetFileName($name, $ext = "html"){
+		return $this->path."/".$name.".".$ext;
+	}
+	
+	private function BuildRootURI(){
+		
+		if (empty($this->name)){
+			return "";
+		}
+		$uri = "../";
+		
+		$puri = $this->parent->BuildRootURI();
+		if (!empty($puri)){
+			$uri = $puri.$uri;
+		}
+		
+		return $uri;
+	}
+	
+}
 
 
 class OfflineConfig {
