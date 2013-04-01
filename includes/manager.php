@@ -96,6 +96,28 @@ class OfflineManager extends Ab_ModuleManager {
 		return $ret;
 	}
 	
+	private function CSSLinksHTML($dir){
+		$css = "";
+		$mfiles = Brick::$builder->GetCSSModFiles();
+		
+		foreach ($mfiles as $srcCssFile => $modname){
+				
+			$fi = pathinfo($srcCssFile);
+			$cssFName = $fi['basename'].".".$fi['extension'];
+			$dstCssFName = $modname."-".$cssFName;
+				
+			$dstCssFile = $dir->cssPath."/".$dstCssFName;
+				
+			if (!file_exists($dstCssFile)){
+				@copy(CWD.$srcCssFile, $dstCssFile);
+			}
+			$mod = Abricos::GetModule($modname);
+				
+			$css .= "<link href='".$dir->GetCSSSrc($dstCssFName."?v=".$mod->version)."' type='text/css' rel='stylesheet' />\n";
+		}
+		return $css;
+	}
+	
 	private $_tplPage = "";
 	public function WritePage(OfflineDir $dir, $fname, $content, $title = ''){
 		$filename = $dir->GetFileName($fname);
@@ -103,18 +125,16 @@ class OfflineManager extends Ab_ModuleManager {
 		if (file_exists($filename)){
 			@unlink($filename);
 		}
-			
+
 		$fh = fopen($filename, 'a');
-		
+
 		if (!$fh){ return false; }
-		
-		$css = "";
 
 		$str = Brick::ReplaceVarByData($this->_tplPage, array(
 			"title" => $title,
 			"content" =>  $content,
 			"rooturi" => $dir->rootURI,
-			"csslinks" => $css
+			"csslinks" => $this->CSSLinksHTML($dir)
 		));
 		
 		fwrite($fh, $str);
@@ -123,7 +143,6 @@ class OfflineManager extends Ab_ModuleManager {
 	}
 	
 	public function WriteImage(OfflineDir $dir, $fhash, $w=0, $h=0){
-		
 		$manFM = FileManagerModule::$instance->GetFileManager();
 		
 		$fhash = $manFM->ImageConvert($fhash, $w, $h, "");
@@ -207,6 +226,8 @@ class OfflineManager extends Ab_ModuleManager {
 		
 		$brickIndex->content = Brick::ReplaceVarByData($brickIndex->content, $modAList);
 		$this->WritePage($rootDir, "index", $brickIndex->content);
+		
+		@copy(CWD."/images/empty.gif", $rootDir->rootPath."/img/empty.gif");
 		
 		return true;
 	}

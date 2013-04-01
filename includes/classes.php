@@ -28,6 +28,7 @@ class OfflineDir {
 	public $rootPath = "";
 	
 	public $imagePath = "";
+	public $cssPath = "";
 	
 	public function __construct($parent, $name){
 		$this->parent = $parent;
@@ -47,12 +48,18 @@ class OfflineDir {
 		$this->rootURI = $this->BuildRootURI();
 		
 		$this->imagePath = $this->rootPath."/img";
+		$this->cssPath = $this->rootPath."/css";
 
 		@mkdir($this->imagePath);
+		@mkdir($this->cssPath);
 	}
 	
 	public function GetImageSrc($fname){
 		return $this->rootURI."img/".$fname;
+	}
+	
+	public function GetCSSSrc($fname){
+		return $this->rootURI."css/".$fname;
 	}
 	
 	public function GetFileName($name, $ext = "html"){
