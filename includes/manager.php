@@ -101,7 +101,7 @@ class OfflineManager extends Ab_ModuleManager {
 		$filename = $dir->GetFileName($fname);
 		
 		if (file_exists($filename)){
-			unlink($filename);
+			@unlink($filename);
 		}
 			
 		$fh = fopen($filename, 'a');
@@ -120,6 +120,41 @@ class OfflineManager extends Ab_ModuleManager {
 		fwrite($fh, $str);
 		fflush($fh);
 		fclose($fh);
+	}
+	
+	public function WriteImage(OfflineDir $dir, $fhash, $w=0, $h=0){
+		
+		$manFM = FileManagerModule::$instance->GetFileManager();
+		
+		$fhash = $manFM->ImageConvert($fhash, $w, $h, "");
+		
+		$finfo = $manFM->GetFileInfo($fhash);
+		
+		$fname = $fhash.".".$finfo['ext'];
+
+		$imgSrc = $dir->GetImageSrc($fname);
+		
+		$file = $dir->imagePath."/".$fname;
+		
+		if (file_exists($file)){ return $imgSrc; }
+		
+		if (!($handle = fopen($file, 'w'))){
+			return $imgSrc;
+		}
+		$fileinfo = $manFM->GetFileData($fhash);
+		$count = 1;
+		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+			fwrite($handle, $fileinfo['filedata']);
+			if (strlen($fileinfo['filedata']) == 1048576) {
+				$startat = (1048576 * $count) + 1;
+				$fileinfo =  $manFM->GetFileData($fhash, $startat);
+				$count++;
+			} else {
+				$fileinfo['filedata'] = '';
+			}
+		}
+		fclose($handle);
+		return $imgSrc;
 	}
 	
 	public function BuildOffline(){
@@ -143,8 +178,10 @@ class OfflineManager extends Ab_ModuleManager {
 		// произвести выгрузку в модулях где есть реализация
 		$sqls = array();
 		foreach ($modules as $name => $module){
-			if (!method_exists($module, 'Offline_IsBuild')){ continue; }
-			if (!$module->Offline_IsBuild()){ continue; }
+			if (!method_exists($module, 'Offline_IsBuild') 
+				|| !$module->Offline_IsBuild()){ 
+				continue; 
+			}
 			
 			$manager = 	$module->GetManager();
 			if (!method_exists($manager, 'Offline_Build')){ continue; }
