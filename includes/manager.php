@@ -235,11 +235,16 @@ class OfflineManager extends Ab_ModuleManager {
 			$manager = 	$module->GetManager();
 			if (!method_exists($manager, 'Offline_Build')){ continue; }
 
-			$modDir = new OfflineDir($rootDir, $module->takelink);
+			$takeLink = $this->config->takeLinkOverride[$name];
+			if (empty($takeLink)){
+				$takeLink = $module->takelink;
+			}
+			
+			$modDir = new OfflineDir($rootDir, $takeLink);
 
 			$manager->Offline_Build($modDir);
 			
-			$link = $name."/index.html";
+			$link = $takeLink."/index.html";
 			
 			if (!empty($vIndex['menuitem-'.$name])){
 				$modList .= Brick::ReplaceVarByData($vIndex['menuitem-'.$name], array(

@@ -90,19 +90,24 @@ class OfflineConfig {
 	 * @var OfflineConfig
 	 */
 	public static $instance;
+	
+	/**
+	 * Предопределение takelink модуля.
+	 * 
+	 * Например: 'eshop' => 'myeshop'
+	 * 
+	 * @var array
+	 */
+	public $takeLinkOverride = array();
 
 	public function __construct($cfg){
 		OfflineConfig::$instance = $this;
 
-		if (empty($cfg)){
-			$cfg = array();
+		if (empty($cfg)){ $cfg = array(); }
+		
+		if (isset($cfg['takeLinkOverride']) && is_array($cfg['takeLinkOverride'])){
+			$this->takeLinkOverride = $cfg['takeLinkOverride'];
 		}
-
-		/*
-		 if (isset($cfg['subscribeSendLimit'])){
-		$this->subscribeSendLimit = intval($cfg['subscribeSendLimit']);
-		}
-		/**/
 	}
 }
 
