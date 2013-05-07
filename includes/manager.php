@@ -180,7 +180,7 @@ class OfflineManager extends Ab_ModuleManager {
 		if (!is_dir($src)){ return; }
 		@mkdir($dst);
 		
-		if ($dh != opendir($src)) { return; }
+		if (!($dh = opendir($src))) { return; }
 		
 		while (($file = readdir($dh)) !== false) {
 			if ($file == "." || $file == ".."){ continue; }
