@@ -11,7 +11,7 @@ Component.entryPoint = function(){
 	var os = Brick.mod.bos;
 	
 	var app = new os.Application(this.moduleName);
-	app.icon = '/modules/scoreb/images/logo-48x48.png';
+	app.icon = '/modules/{C#MODNAME}/images/logo-48x48.png';
 	app.entryComponent = 'wspace';
 	app.entryPoint = 'ws';
 	
