@@ -99,11 +99,11 @@ class OfflineManager extends Ab_ModuleManager {
 	private function CSSLinksHTML($dir){
 		$css = "";
 		$mfiles = Brick::$builder->GetCSSModFiles();
-		
+
 		foreach ($mfiles as $srcCssFile => $modname){
 				
 			$fi = pathinfo($srcCssFile);
-			$cssFName = $fi['basename'].".".$fi['extension'];
+			$cssFName = $fi['basename'];// .".".$fi['extension'];
 			$dstCssFName = $modname."-".$cssFName;
 				
 			$dstCssFile = $dir->cssPath."/".$dstCssFName;
@@ -176,6 +176,27 @@ class OfflineManager extends Ab_ModuleManager {
 		return $imgSrc;
 	}
 	
+	public function CopyDir($src, $dst){
+		if (!is_dir($src)){ return; }
+		@mkdir($dst);
+		
+		if (!($dh = opendir($src))) { return; }
+		
+		while (($file = readdir($dh)) !== false) {
+			if ($file == "." || $file == ".."){ continue; }
+			
+			$srcFile = $src."/".$file;
+			$dstFile = $dst."/".$file;
+			
+			if (filetype($srcFile) == "file"){
+				@copy($srcFile, $dstFile);
+			}else if (filetype($srcFile) == "dir"){
+				$this->CopyDir($srcFile, $dstFile);
+			}
+		}
+		closedir($dh);
+	}
+	
 	public function BuildOffline(){
 		if (!$this->IsAdminRole()){ return null; }
 		
@@ -189,7 +210,16 @@ class OfflineManager extends Ab_ModuleManager {
 		Abricos::$instance->modules->RegisterAllModule();
 		$modules = Abricos::$instance->modules->GetModules();
 		
-		$rootDir = new OfflineDir(null, CWD."/cache/offline");
+		$rootPath = CWD."/cache/offline";
+		
+		$rootDir = new OfflineDir(null, $rootPath);
+		
+		// сформировать стуктуру
+		// клонировать базовую структуру
+		$this->CopyDir(CWD."/modules/offline/template", $rootPath);
+		
+		// клонировать перегруженную структуру
+		$this->CopyDir(CWD."/tt/".Brick::$style."/override/offline/template", $rootPath);
 		
 		$modList = "";
 		$modAList = array();
@@ -205,11 +235,16 @@ class OfflineManager extends Ab_ModuleManager {
 			$manager = 	$module->GetManager();
 			if (!method_exists($manager, 'Offline_Build')){ continue; }
 
-			$modDir = new OfflineDir($rootDir, $module->takelink);
+			$takeLink = $this->config->takeLinkOverride[$name];
+			if (empty($takeLink)){
+				$takeLink = $module->takelink;
+			}
+			
+			$modDir = new OfflineDir($rootDir, $takeLink);
 
 			$manager->Offline_Build($modDir);
 			
-			$link = $name."/index.html";
+			$link = $takeLink."/index.html";
 			
 			if (!empty($vIndex['menuitem-'.$name])){
 				$modList .= Brick::ReplaceVarByData($vIndex['menuitem-'.$name], array(
